@@ -14,8 +14,18 @@ public class Domain {
     private String ip;
     
     private String domain;
+    
+    private Integer planId;
 
-    public Integer getId() {
+    public Integer getPlanId() {
+		return planId;
+	}
+
+	public void setPlanId(Integer planId) {
+		this.planId = planId;
+	}
+
+	public Integer getId() {
         return id;
     }
 

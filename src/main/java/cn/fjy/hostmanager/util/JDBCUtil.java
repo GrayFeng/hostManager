@@ -36,6 +36,27 @@ public class JDBCUtil {
         }
         return conn;
     }
+    
+    public static Integer insert(String sql){
+    	Connection conn = getConnection(null);
+        Statement st = null;
+        ResultSet rs = null;
+        Integer id = null;
+        try {
+            st = conn.createStatement();
+            st.executeUpdate(sql);
+            rs = st.getGeneratedKeys();
+            while(rs.next()){
+            	id = rs.getInt(1);
+            	break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(conn, st, rs);
+        }
+        return id;
+    }
 
     public static void modify(String sql) {
         Connection conn = getConnection(null);
@@ -61,6 +82,7 @@ public class JDBCUtil {
                     st.addBatch(sql);
                 }
                 st.executeBatch();
+                conn.commit();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,7 +137,7 @@ public class JDBCUtil {
             try {
                 ResultSetMetaData rsMetaData = rs.getMetaData();
                 int columnCount = rsMetaData.getColumnCount();
-                for (int i = 0; i < columnCount; i++) {
+                for (int i = 1; i <= columnCount; i++) {
                     String cName = rsMetaData.getColumnLabel(i);
                     if (!Strings.isNullOrEmpty(cName)) {
                         map.put(cName, rs.getString(cName));
