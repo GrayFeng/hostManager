@@ -1,14 +1,15 @@
 package cn.fjy.hostmanager.plan;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-
 import cn.fjy.hostmanager.pojo.Domain;
 import cn.fjy.hostmanager.pojo.Plan;
 import cn.fjy.hostmanager.util.JDBCUtil;
+
+import com.google.common.collect.Lists;
 
 /**
  * Description: ResourceFileManager.java All Rights Reserved.
@@ -52,8 +53,10 @@ public class PlanDao {
 	}
 
 	public void update(Plan plan) {
-		if (plan != null && plan.getId() != null) {
-			del(plan.getId());
+		if (plan != null) {
+			if (plan.getId() != null) {
+				del(plan.getId());
+			}
 			add(plan);
 		}
 	}
@@ -79,6 +82,7 @@ public class PlanDao {
 		if (resultList != null && resultList.size() > 0) {
 			Map<String, Object> map = resultList.get(0);
 			plan = map2Plan(map);
+			plan.setDomainList(findDomainList(id));
 		}
 		return plan;
 	}
@@ -98,8 +102,12 @@ public class PlanDao {
 	}
 
 	public void init() {
-		JDBCUtil.modify("CREATE TABLE T_PLAN (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,NAME VARCHAR(100) NOT NULL)");
-		JDBCUtil.modify("CREATE TABLE T_DOMAIN (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,IP VARCHAR(100) NOT NULL,DOMAIN VARCHAR(100) NOT NULL,PLAN_ID INTEGER NOT NULL)");
+		String basePath = System.getProperty("user.dir");
+		File dataFile = new File(basePath + File.separator + "data");
+		if(!dataFile.exists()){
+			JDBCUtil.modify("CREATE TABLE T_PLAN (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,NAME VARCHAR(100) NOT NULL)");
+			JDBCUtil.modify("CREATE TABLE T_DOMAIN (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,IP VARCHAR(100) NOT NULL,DOMAIN VARCHAR(100) NOT NULL,PLAN_ID INTEGER NOT NULL)");
+		}
 	}
 
 	private Plan map2Plan(Map<String, Object> map) {
@@ -116,6 +124,10 @@ public class PlanDao {
 		domain.setDomain(map.get("DOMAIN").toString());
 		domain.setPlanId(Integer.valueOf(map.get("PLAN_ID").toString()));
 		return domain;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(System.getProperty("user.dir"));
 	}
 
 }
