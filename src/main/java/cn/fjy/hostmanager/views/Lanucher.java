@@ -64,7 +64,6 @@ public class Lanucher extends JFrame {
 	 */
 	public Lanucher() {
 		initComponents();
-		service.initDatabase();
 	}
 
 	private void initComponents() {
@@ -102,6 +101,8 @@ public class Lanucher extends JFrame {
 		jTable1.setModel(tableModel);
 		jScrollPane1.setViewportView(jTable1);
 
+		service.initDatabase();
+		
 		initData();
 
 	        GroupLayout layout = new GroupLayout(getContentPane());
