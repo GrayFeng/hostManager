@@ -9,6 +9,6 @@ package cn.fjy.hostmanager.host;
 
 public class HostFileSupport {
 	
-	private String hostFileName = "hosts";
+	private String hostFileName = "hosts1";
 
 }
