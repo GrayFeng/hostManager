@@ -1,9 +1,11 @@
 package cn.fjy.hostmanager.plan;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import com.google.common.collect.Lists;
+
+import cn.fjy.hostmanager.host.HostFileSupport;
 import cn.fjy.hostmanager.pojo.Domain;
 import cn.fjy.hostmanager.pojo.Plan;
 
@@ -17,23 +19,33 @@ import cn.fjy.hostmanager.pojo.Plan;
 public class PlanService {
 
 	private PlanDao dao = new PlanDao();
+	
+	private HostFileSupport hostFileSupport = new HostFileSupport();
 
 	public void save(Integer planId, String planName,
 			Vector<Vector<Object>> rows) {
 		Plan plan = new Plan();
 		plan.setName(planName);
 		plan.setId(planId);
-		if (rows != null) {
-			List<Domain> domainList = new ArrayList<Domain>();
+		List<Domain> domainList = rows2DomainList(rows);
+		if (domainList != null) {
+			plan.setDomainList(domainList);
+			dao.update(plan);
+		}
+	}
+
+	public List<Domain> rows2DomainList(Vector<Vector<Object>> rows) {
+		List<Domain> domainList = null;
+		if (rows != null && rows.size() > 0) {
+			domainList = Lists.newArrayList();
 			for (Vector<Object> row : rows) {
 				Domain domain = new Domain();
 				domain.setIp(row.get(0).toString());
 				domain.setDomain(row.get(1).toString());
 				domainList.add(domain);
 			}
-			plan.setDomainList(domainList);
-			dao.update(plan);
 		}
+		return domainList;
 	}
 
 	public void del(Integer planId) {
@@ -47,9 +59,18 @@ public class PlanService {
 	public List<Domain> findDomainList(Integer planId) {
 		return dao.findDomainList(planId);
 	}
-	
-	public void initDatabase(){
+
+	public void initDatabase() {
 		dao.init();
+	}
+	
+	public boolean switchDNS(Vector<Vector<Object>> rows){
+		boolean result = false;
+		List<Domain> domainList = rows2DomainList(rows);
+		if(domainList != null){
+			result = hostFileSupport.addDomainMapping(domainList);
+		}
+		return result;
 	}
 
 }

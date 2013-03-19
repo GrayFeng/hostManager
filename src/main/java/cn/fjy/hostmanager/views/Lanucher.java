@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import javax.swing.WindowConstants;
 
+import cn.fjy.hostmanager.host.HostFileSupport;
 import cn.fjy.hostmanager.plan.PlanService;
 import cn.fjy.hostmanager.pojo.Domain;
 import cn.fjy.hostmanager.pojo.Plan;
@@ -41,7 +42,8 @@ public class Lanucher extends JFrame {
 	private JButton btnDel;
 	private JButton btnSave;
 	private JButton btnDelPlan;
-	private JButton txtSwitchDNS;
+	private JButton btnSwitchDNS;
+	private JButton btnClearMapping;
 	private JComboBox cboxPlanList;
 	private JLabel labPlanName;
 	private JLabel labNewPlanName;
@@ -82,7 +84,8 @@ public class Lanucher extends JFrame {
 		btnDel = new JButton();
 		btnSave = new JButton();
 		btnDelPlan = new JButton();
-		txtSwitchDNS = new JButton();
+		btnSwitchDNS = new JButton();
+		btnClearMapping = new JButton();
 		jScrollPane1 = new JScrollPane();
 		jTable1 = new JTable();
 
@@ -103,6 +106,8 @@ public class Lanucher extends JFrame {
 
 		service.initDatabase();
 		
+		new HostFileSupport().backup();
+		
 		initData();
 
 	        GroupLayout layout = new GroupLayout(getContentPane());
@@ -118,15 +123,14 @@ public class Lanucher extends JFrame {
 	                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
 	                        .addComponent(domainText))
 	                    .addGroup(layout.createSequentialGroup()
+	                    	.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED,50,50)
 	                        .addComponent(btnAdd)
 	                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
 	                        .addComponent(btnDel)
 	                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
 	                        .addComponent(btnSave)
 	                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-	                        .addComponent(btnDelPlan)
-	                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-	                        .addComponent(txtSwitchDNS))
+	                        .addComponent(btnDelPlan))
 	                    .addGroup(layout.createSequentialGroup()
 	                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 	                            .addComponent(labPlanName)
@@ -140,7 +144,12 @@ public class Lanucher extends JFrame {
 	                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 	                                .addComponent(planNameText, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE))
 	                            .addComponent(ipText))
-	                        .addGap(0, 0, Short.MAX_VALUE)))
+	                        .addGap(0, 0, Short.MAX_VALUE))
+	                        .addGroup(layout.createSequentialGroup()
+	                        		.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED,120,120)
+	    	                        .addComponent(btnSwitchDNS)
+	    	                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+	    	                        .addComponent(btnClearMapping)))
 	                .addContainerGap())
 	        );
 	        layout.setVerticalGroup(
@@ -164,11 +173,14 @@ public class Lanucher extends JFrame {
 	                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 	                    .addComponent(btnDel)
 	                    .addComponent(btnSave)
-	                    .addComponent(txtSwitchDNS)
 	                    .addComponent(btnAdd)
 	                    .addComponent(btnDelPlan))
 	                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 	                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 266, GroupLayout.PREFERRED_SIZE)
+	                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+	                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+	                    .addComponent(btnSwitchDNS)
+	                    .addComponent(btnClearMapping))
 	                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 	        );
 
@@ -192,7 +204,10 @@ public class Lanucher extends JFrame {
 		
 		btnDelPlan.setText("删除方案");
 
-		txtSwitchDNS.setText("切换DNS");
+		btnSwitchDNS.setText("切换DNS");
+		
+		btnClearMapping.setText("还原Hosts");
+		
 	}
 
 	private void initCombox() {
@@ -228,6 +243,40 @@ public class Lanucher extends JFrame {
 				btnPlanDelMouseClicked(evt);
 			}
 		});
+		
+		btnSwitchDNS.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				btnSwitchDnsClicked();
+			}
+			
+		});
+		
+		btnClearMapping.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				clearMapping();
+			}
+		});
+	}
+
+	private void clearMapping() {
+		boolean result = new HostFileSupport().clearMapping();
+		if (result) {
+			JOptionPane.showMessageDialog(this, "Hosts文件已还原");
+		}
+	}
+
+	private void btnSwitchDnsClicked() {
+		Vector<Vector<Object>> rows = tableModel.getRows();
+		if (rows == null || rows.size() < 1) {
+			JOptionPane.showMessageDialog(this, "没有需要切换的DNS信息");
+			return;
+		}
+		if (service.switchDNS(rows)) {
+			JOptionPane.showMessageDialog(this, "DNS映射更换成功！");
+			btnSaveMouseClicked(null);
+		} else {
+			JOptionPane.showMessageDialog(this, "DNS映射更换失败！");
+		}
 	}
 
 	// save plan

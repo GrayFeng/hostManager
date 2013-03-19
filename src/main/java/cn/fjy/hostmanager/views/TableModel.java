@@ -17,7 +17,7 @@ import cn.fjy.hostmanager.pojo.Domain;
 public class TableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
-	private String[] titles = { "域名", "IP" };
+	private String[] titles = {"IP", "域名"};
 
 	private Vector<Vector<Object>> rows;
 

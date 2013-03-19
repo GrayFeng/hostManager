@@ -34,7 +34,7 @@ public class HostFileSupport {
 	public void backup() {
 		File hostFile = getHostFile();
 		File backupFile = getBackupFile();
-		if (hostFile.exists()) {
+		if (hostFile.exists() && !backupFile.exists()) {
 			if (backupFile.exists()) {
 				backupFile.delete();
 			}
@@ -68,7 +68,8 @@ public class HostFileSupport {
 	 * add domain mapping
 	 * @param domainList
 	 */
-	public void addDomainMapping(List<Domain> domainList){
+	public boolean addDomainMapping(List<Domain> domainList){
+		boolean result = false;
 		String mappingStr = getDomainMappingStr(domainList);
 		if(!Strings.isNullOrEmpty(mappingStr)){
 			File hostFile = getHostFile();
@@ -77,12 +78,31 @@ public class HostFileSupport {
 					String context = getHostFileContextWithOutMapping();
 					if(context != null){
 						Files.write((context + mappingStr).getBytes(),hostFile);
+						result = true;
 					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return result;
+	}
+	
+	public boolean clearMapping(){
+		boolean result = false;
+		String context = getHostFileContextWithOutMapping();
+		if(!Strings.isNullOrEmpty(context)){
+			File hostFile = getHostFile();
+			if(hostFile.exists()){
+				try {
+					Files.write(context.getBytes(),hostFile);
+					result = true;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
+		return result;
 	}
 	
 	private String getHostFileContextWithOutMapping(){
@@ -108,13 +128,13 @@ public class HostFileSupport {
 						for(int i = 0;i<list.size();i++){
 							if(i < startIndex || i > endIndex){
 								buffer.append(list.get(i));
-								buffer.append("\r");
-								buffer.append("\n");
+								buffer.append("\r\n");
 							}
 						}
 					}else{
 						for(String str : list){
 							buffer.append(str);
+							buffer.append("\r\n");
 						}
 					}
 				}
@@ -131,14 +151,13 @@ public class HostFileSupport {
 		if(domainList != null && domainList.size() > 0){
 			buffer = new StringBuffer();
 			buffer.append(dividingLineStart);
-			buffer.append("\r");
-			buffer.append("\n");
+			buffer.append("\r\n");
 			for(Domain domain : domainList){
 				buffer.append(domain.getIp() + "    " + domain.getDomain());
+				buffer.append("\r\n");
 			}
 			buffer.append(dividingLineEnd);
-			buffer.append("\r");
-			buffer.append("\n");
+			buffer.append("\r\n");
 		}
 		return buffer == null ? null :buffer.toString();
 	}
@@ -150,8 +169,4 @@ public class HostFileSupport {
 	private File getBackupFile(){
 		return new File(getHostFile().getAbsoluteFile() + backupSuffix);
 	}
-	
-	public static void main(String[] args) {
-	}
-
 }
