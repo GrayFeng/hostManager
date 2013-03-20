@@ -63,7 +63,7 @@ public class PlanDao {
 
 	public List<Plan> fingPlanList() {
 		List<Plan> planList = null;
-		String sql = "SELECT * FROM T_PLAN";
+		String sql = "SELECT * FROM T_PLAN ORDER BY ID DESC";
 		List<Map<String, Object>> resultList = JDBCUtil.query(sql);
 		if (resultList != null) {
 			planList = Lists.newArrayList();
@@ -89,7 +89,7 @@ public class PlanDao {
 
 	public List<Domain> findDomainList(Integer id) {
 		List<Domain> list = null;
-		String sql = "SELECT * FROM T_DOMAIN WHERE PLAN_ID=" + id;
+		String sql = "SELECT * FROM T_DOMAIN WHERE PLAN_ID=" + id + "ORDER BY ID DESC";
 		List<Map<String, Object>> resultList = JDBCUtil.query(sql);
 		if (resultList != null && resultList.size() > 0) {
 			list = Lists.newArrayList();
