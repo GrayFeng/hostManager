@@ -188,6 +188,8 @@ public class Lanucher extends JFrame {
 	}
 	    
 	private void initComponentsTitle() {
+		this.setTitle("Hosts Manager");
+		
 		labPlanName.setText("方案：");
 
 		labNewPlanName.setText("新方案名：");
