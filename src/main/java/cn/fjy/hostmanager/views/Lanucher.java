@@ -275,7 +275,7 @@ public class Lanucher extends JFrame {
 		}
 		if (service.switchDNS(rows)) {
 			JOptionPane.showMessageDialog(this, "DNS映射更换成功！");
-			btnSaveMouseClicked(null);
+			//btnSaveMouseClicked(null);
 		} else {
 			JOptionPane.showMessageDialog(this, "DNS映射更换失败！");
 		}
@@ -295,7 +295,7 @@ public class Lanucher extends JFrame {
 		}
 		service.save(planId, planName, tableModel.getRows());
 		planNameText.setText("");
-		initData();
+        initTableData(planId);
 	}
 
 	// add
