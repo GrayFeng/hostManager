@@ -21,7 +21,7 @@ public class PlanDao {
 
 	public void add(Plan plan) {
 		if (plan != null) {
-			String planSql = "INSERT INTO T_PLAN (NAME) VALUES('"
+			String planSql = "INSERT INTO T_PLAN (ID,NAME) VALUES("+plan.getId()+",'"
 					+ plan.getName() + "')";
 			List<Domain> domainList = plan.getDomainList();
 			if (domainList != null && domainList.size() > 0) {
@@ -89,7 +89,7 @@ public class PlanDao {
 
 	public List<Domain> findDomainList(Integer id) {
 		List<Domain> list = null;
-		String sql = "SELECT * FROM T_DOMAIN WHERE PLAN_ID=" + id + "ORDER BY ID DESC";
+		String sql = "SELECT * FROM T_DOMAIN WHERE PLAN_ID=" + id + " ORDER BY ID DESC";
 		List<Map<String, Object>> resultList = JDBCUtil.query(sql);
 		if (resultList != null && resultList.size() > 0) {
 			list = Lists.newArrayList();
