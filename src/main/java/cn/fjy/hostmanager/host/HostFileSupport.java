@@ -106,44 +106,62 @@ public class HostFileSupport {
 	}
 	
 	private String getHostFileContextWithOutMapping(){
-		StringBuffer buffer = null;
-		File hostFile = getHostFile();
-		if(hostFile.exists()){
-			try {
-				List<String> list = Files.readLines(hostFile, Charset.defaultCharset());
-				if(list != null && list.size() > 0){
-					buffer = new StringBuffer();
-					int startIndex = 0;
-					int endIndex = 0;
-					for(int i = 0 ; i < list.size() ; i++){
-						String str = list.get(i);
-						if(dividingLineStart.equals(str)){
-							startIndex = i;
-						}
-						if(dividingLineEnd.equals(str)){
-							endIndex = i;
-						}
-					}
-					if(startIndex != endIndex && startIndex < endIndex && endIndex < list.size()){
-						for(int i = 0;i<list.size();i++){
-							if(i < startIndex || i > endIndex){
-								buffer.append(list.get(i));
-								buffer.append("\r\n");
-							}
-						}
-					}else{
-						for(String str : list){
-							buffer.append(str);
-							buffer.append("\r\n");
-						}
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return buffer == null ? null : buffer.toString();
-	} 
+        StringBuffer buffer = null;
+        List<String> list = readHostFileLines();
+        if (list != null && list.size() > 0) {
+            buffer = new StringBuffer();
+            int startIndex = 0;
+            int endIndex = 0;
+            for (int i = 0; i < list.size(); i++) {
+                String str = list.get(i);
+                if (dividingLineStart.equals(str)) {
+                    startIndex = i;
+                }
+                if (dividingLineEnd.equals(str)) {
+                    endIndex = i;
+                }
+            }
+            if (startIndex != endIndex && startIndex < endIndex && endIndex < list.size()) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (i < startIndex || i > endIndex) {
+                        buffer.append(list.get(i));
+                        buffer.append("\r\n");
+                    }
+                }
+            } else {
+                for (String str : list) {
+                    buffer.append(str);
+                    buffer.append("\r\n");
+                }
+            }
+        }
+        return buffer == null ? null : buffer.toString();
+    }
+
+    public String getHostFileContent(){
+        StringBuffer buffer = new StringBuffer();
+        List<String> list = readHostFileLines();
+        if(list != null && list.size()>0){
+            for(String str : list){
+               buffer.append(str);
+               buffer.append("\r\n");
+            }
+        }
+        return buffer.toString();
+    }
+
+    private List<String> readHostFileLines(){
+        List<String> list = null;
+        File hostFile = getHostFile();
+        if(hostFile.exists()){
+            try {
+                  list = Files.readLines(hostFile, Charset.defaultCharset());
+            }catch (IOException e){
+                    e.printStackTrace();
+            }
+        }
+        return list;
+    }
 	
 	
 	private String getDomainMappingStr(List<Domain> domainList){
