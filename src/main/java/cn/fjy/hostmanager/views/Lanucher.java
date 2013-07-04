@@ -8,9 +8,13 @@ import cn.fjy.hostmanager.host.HostFileSupport;
 import cn.fjy.hostmanager.plan.PlanService;
 import cn.fjy.hostmanager.pojo.Domain;
 import cn.fjy.hostmanager.pojo.Plan;
+
 import com.google.common.base.Strings;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -101,6 +105,15 @@ public class Lanucher extends JFrame {
         jScrollPane4TextArea.setViewportView(hostFileContent);
         jTabbedPane1.addTab("地址列表", jScrollPane1);
         jTabbedPane1.addTab("本地配置", jScrollPane4TextArea);
+        jTabbedPane1.addChangeListener(new ChangeListener() {
+			
+			public void stateChanged(ChangeEvent e) {
+				if(jTabbedPane1.getSelectedIndex() == 1){
+					 HostFileSupport hostFileSupport = new HostFileSupport();
+				     hostFileContent.setText(hostFileSupport.getHostFileContent());
+				}
+			}
+		});
 
         service.initDatabase();
 
@@ -347,8 +360,6 @@ public class Lanucher extends JFrame {
         initTableData(pId);
         cBoxModel.initItems(planList);
         cboxPlanList.updateUI();
-        HostFileSupport hostFileSupport = new HostFileSupport();
-        hostFileContent.setText(hostFileSupport.getHostFileContent());
     }
 
     private void initTableData(Integer planId) {
